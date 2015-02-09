@@ -14,7 +14,17 @@ module.exports = function(app) {
 
 
         // TODO: lookup restaurants whose names contain the given keyword
-        var rs = [restaurants[6], restaurants[10]] // hardcoded for 'Pizza'
+        //var rs = [restaurants[6], restaurants[10]] // hardcoded for 'Pizza'
+
+        function keywordFilter(element)
+        {
+            if (~element.name.indexOf(keyword))
+            {
+                return element
+            }
+        }
+
+        var rs = restaurants.filter(keywordFilter)
 
         res.render('listRestaurants.jade', {
             restaurants: rs
@@ -25,7 +35,23 @@ module.exports = function(app) {
         var x = req.params.x
 
         // TODO: lookup restaurants good for  :x
-        var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+        // var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+
+        function keywordFilter(element)
+        {
+            if (element['attributes'])
+            {
+                if (element['attributes']['Good For'])
+                {
+                    if (element['attributes']['Good For'][x] === true)
+                    {
+                        return element
+                    }
+                }
+            }
+        }
+
+        var rs = restaurants.filter(keywordFilter)
 
         res.render('listRestaurants.jade', {
             restaurants: rs
@@ -36,7 +62,23 @@ module.exports = function(app) {
         var x = req.params.x
 
         // TODO: lookup restaurants has ambience of :x
-        var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+        // var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+
+        function keywordFilter(element)
+        {
+            if (element['attributes'])
+            {
+                if (element['attributes']['Ambience'])
+                {
+                    if (element['attributes']['Ambience'][x] === true)
+                    {
+                        return element
+                    }
+                }
+            }
+        }
+
+        var rs = restaurants.filter(keywordFilter)
 
         res.render('listRestaurants.jade', {
             restaurants: rs
@@ -47,7 +89,23 @@ module.exports = function(app) {
         var x = req.params.x
 
         // TODO: lookup restaurants belonging to category :x
-        var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+        // var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+
+        function keywordFilter(element)
+        {
+            if (element["categories"])
+            {
+                for (var i = 0; i < element['categories'].length; i ++)
+                {
+                    if (element['categories'][i] == x)
+                    {
+                        return element
+                    }
+                }
+            }
+        }
+
+        var rs = restaurants.filter(keywordFilter)
 
         res.render('listRestaurants.jade', {
             restaurants: rs
@@ -60,7 +118,27 @@ module.exports = function(app) {
         var relationship = req.params.relationship
 
         // TODO: lookup restaurants with starts higher or lower than :number
-        var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+        // var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+
+        function keywordFilter(element)
+        {
+            if (element['stars'])
+            {
+                if (relationship == 'below')
+                {
+                    return element
+                }
+                else
+                {
+                    if (element['stars'] >= number)
+                    {
+                        return element
+                    }
+                }
+            }
+        }
+
+        var rs = restaurants.filter(keywordFilter)
 
         res.render('listRestaurants.jade', {
             restaurants: rs
@@ -77,7 +155,68 @@ module.exports = function(app) {
         console.log('req.query: ', req.query)    
         
         // // TODO: lookup restaurants with the given query parameters
-        var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+        // var rs = [restaurants[1], restaurants[2], restaurants[3]] // hardcoded fake results
+
+        function keywordFilter(element)
+        {
+            var catName = true
+            var catStars = true
+            var catCateg = true
+            var catAmb = true
+
+            if (name)
+            {
+                if (~element.name.indexOf(name))
+                {
+                    catName = true
+                }
+                else
+                {
+                    catName = false
+                }
+            }
+            if (minStars)
+            {
+                if (element.stars < minStars)
+                {
+                    catStars = false
+                }
+            }
+            if (category)
+            {
+                for (var i = 0; i < element.category.length; i++)
+                {
+                    if (element.categories[i] == category)
+                    {
+                        catCateg = true
+                        break
+                    }
+                    else
+                    {
+                        catCateg = false
+                    }
+                }
+            }
+            if (ambience)
+            {
+                if (element['attributes'])
+                {
+                    if (element['attributes']['Ambience'])
+                    {
+                        if (element['attributes']['Ambience'][ambience] === false)
+                        {
+                            catAmb = false 
+                        }
+                    }
+                }
+            }
+            if (catName && catStars && catCateg && catAmb)
+            {
+                return element
+            }
+        }
+
+        var rs = restaurants.filter(keywordFilter)
 
         res.render('listRestaurants.jade', {
             restaurants: rs
